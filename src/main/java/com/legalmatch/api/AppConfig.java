@@ -18,9 +18,7 @@ import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 public class AppConfig {
 
     @Value("${lm.api.playground.enabled:false}") private boolean isPlaygroundEnabled;
-    @Value("${lm.api.key:key01}") private String apiKey;
-    @Value("${lm.load.action.enabled:false}") private boolean isLoadActionEnabled;
-
+    @Value("${lm.api.key}") private String apiKey;
     @Bean
     public Filter openFilter() {
         return new OpenEntityManagerInViewFilter();
@@ -50,16 +48,6 @@ public class AppConfig {
         return filterBean;
     }
 
-    @Bean
-    public FilterRegistrationBean<LoadActionFilter> loadActionFilter() {
-        FilterRegistrationBean<LoadActionFilter> filterBean = new FilterRegistrationBean<>();
-        filterBean.setFilter(new LoadActionFilter(isLoadActionEnabled));
-        filterBean.addUrlPatterns(
-                "/load",
-                "/load/*"
-        );
-        return filterBean;
-    }
 }
 
 

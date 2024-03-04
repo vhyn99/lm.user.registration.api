@@ -73,29 +73,23 @@ public class BridgeController {
             for (int attempt = 1; attempt <= maxRetries; attempt++) {
                 try {
                     log.info("[BridgeController | Webhook Event] Forwarding event to: {} (Attempt {}/{})", webhookUrl, attempt, maxRetries);
-                    ResponseEntity<String> response = null;
                     if ("lm".equalsIgnoreCase(webhookEntity.getWebhookId())) {
-                        response = restTemplate.postForEntity(webhookUrl, payload, String.class);
+                        restTemplate.postForEntity(webhookUrl, payload, String.class);
                     }
                     else if ("ccpm".equalsIgnoreCase(webhookEntity.getWebhookId())) {
-                        //response = restTemplate.postForEntity(webhookUrl, payload, String.class);
                         processGraphQLRequest(payload, webhookUrl);
                     }
                     log.info("[BridgeController | Webhook Event] Event forwarded successfully");
-
-                    // Process the response here if needed
-                    //log.info("[BridgeController | Webhook Event] Target URL Response: {}", response.getBody());
-
                     onSuccess = true;
                     break; // Break the loop if successful
                 } catch (HttpStatusCodeException e) {
                     log.error("[BridgeController | Webhook Event] Error forwarding event to: {} (Attempt {}/{})", webhookUrl, attempt, maxRetries);
                     log.error("[BridgeController | Webhook Event] Root Cause: {}", getRootCause(e).getMessage());
-                    Thread.sleep(1500);
+                    Thread.sleep(500);
                 } catch (RestClientException e) {
                     log.error("[BridgeController | Webhook Event] General error forwarding event to: {} (Attempt {}/{})", webhookUrl, attempt, maxRetries);
                     log.error("[BridgeController | Webhook Event] Root Cause: {}", getRootCause(e).getMessage());
-                    Thread.sleep(1500);
+                    Thread.sleep(500);
                 }
             }
         }
