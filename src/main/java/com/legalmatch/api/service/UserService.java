@@ -37,7 +37,7 @@ public class UserService {
     }
 
     public void registerUser(User user) throws JsonProcessingException {
-        userRepository.save(user);
+        //userRepository.save(user);
         this.forward(user);
         //String userJson = objectMapper.writeValueAsString(user);
         //eventPublisher.publishEvent("client.registration.queue", userJson);

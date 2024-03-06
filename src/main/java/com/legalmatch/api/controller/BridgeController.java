@@ -76,9 +76,6 @@ public class BridgeController {
                     if ("lm".equalsIgnoreCase(webhookEntity.getWebhookId())) {
                         restTemplate.postForEntity(webhookUrl, payload, String.class);
                     }
-                    else if ("ccpm".equalsIgnoreCase(webhookEntity.getWebhookId())) {
-                        processGraphQLRequest(payload, webhookUrl);
-                    }
                     log.info("[BridgeController | Webhook Event] Event forwarded successfully");
                     onSuccess = true;
                     break; // Break the loop if successful
@@ -101,73 +98,6 @@ public class BridgeController {
             log.error("[BridgeController | Webhook Event] All attempts failed. Webhook event processing failed.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Webhook event processing failed.");
-        }
-    }
-
-    private ResponseEntity<String> processGraphQLRequest(String payload, String webhookUrl) {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            JsonNode rootNode = objectMapper.readTree(payload);
-            JsonNode clientInputNode = rootNode;
-
-            // Extract individual fields
-            String username = clientInputNode.path("username").asText();
-            String email = clientInputNode.path("email").asText();
-            String password = clientInputNode.path("password").asText();
-            String firstName = clientInputNode.path("firstName").asText();
-            String lastName = clientInputNode.path("lastName").asText();
-            // Extract other fields as needed
-
-            // Now you can use the extracted values as needed, for example, to perform the GraphQL mutation
-            performGraphQLMutation(firstName, lastName, email, webhookUrl);
-
-            return ResponseEntity.ok("Webhook event processed successfully");
-        } catch (IOException e) {
-            log.error("Error parsing webhook payload", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error processing webhook event");
-        }
-    }
-
-    private void performGraphQLMutation(String firstName, String lastName, String email, String url) {
-        String graphqlEndpoint = url;
-        String apiKey = "GbXvJk48DSds5sxzWGW0"; // Replace with your API key
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("x-api-key", apiKey); // Add x-api-key header
-
-        String mutation = String.format(
-                "mutation { insertClient(ClientInput: { firstName: \"%s\", lastName: \"%s\", email: \"%s\" }) { id firstName lastName email } }",
-                firstName, lastName, email);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode requestJson = objectMapper.createObjectNode().put("query", mutation);
-
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestJson.toString(), headers);
-
-        //HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(graphqlEndpoint, requestEntity, String.class);
-
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            // Handle successful response
-            String response = responseEntity.getBody();
-            // Process the GraphQL server response if needed
-            log.info("GraphQL server response: {}", response);
-        } else {
-            // Handle unsuccessful response
-            log.error("Error from GraphQL server. HTTP status: {}", responseEntity.getStatusCode());
-        }
-    }
-
-    private String toJsonString(Map<String, Object> map) {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            return objectMapper.writeValueAsString(map);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error converting Map to JSON string", e);
         }
     }
 

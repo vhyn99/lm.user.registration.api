@@ -11,8 +11,8 @@
 	</parent>
 
 	<groupId>com.legalmatch</groupId>
-	<artifactId>api.registrationcd</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>lm.api.registration</artifactId>
+	<version>0.1</version>
 	<name>LM-USER-REGISTRATION-API</name>
 	<description>LM-USER-REGISTRATION-API</description>
 

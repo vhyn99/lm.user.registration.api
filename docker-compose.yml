@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  lm-api-registration:
+    image: lm-api-registration:tag
+    container_name: lm-api-registration
+    networks:
+      - local-net
+    ports:
+      - "8200:8200"
+    restart: always
+
+networks:
+  local-net:
+    external: true
